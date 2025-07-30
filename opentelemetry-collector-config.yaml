@@ -1,0 +1,50 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+processors:
+  batch:
+    send_batch_size: 100
+    timeout: 1s
+  resourcedetection:
+    detectors: [env, system]
+    system:
+      resource_attributes:
+        os.type: {enabled: true}
+        os.description: {enabled: true}
+        host.arch: {enabled: true}
+        host.name: {enabled: true}
+        container.id: {enabled: true} # From Docker environment
+
+exporters:
+  jaeger:
+    grpc:
+      endpoint: jaeger:14250 # Jaeger service name in docker-compose, default gRPC port
+
+  prometheus:
+    endpoint: 0.0.0.0:8889 # Expose collector's own metrics on this port
+    # You can also use prometheusremotewrite exporter to send metrics directly to Prometheus:
+    # prometheusremotewrite:
+    #   endpoint: http://prometheus:9090/api/v1/write
+
+  loki:
+    endpoint: http://loki:3100/loki/api/v1/push
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [resourcedetection, batch]
+      exporters: [jaeger]
+
+    metrics:
+      receivers: [otlp]
+      processors: [resourcedetection, batch]
+      exporters: [prometheus] # Exports to the collector's own Prometheus endpoint for scraping by Prometheus
+
+    logs:
+      receivers: [otlp]
+      processors: [resourcedetection, batch]
+      exporters: [loki]
