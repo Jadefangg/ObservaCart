@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # OpenTelemetry Collector: Receives, processes, and exports telemetry data
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.99.0 # Using a specific version for stability
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./opentelemetry-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+      - "8889:8889" # Prometheus metrics exporter for the collector itself
+    depends_on:
+      - jaeger
+      - prometheus
+      - loki
+    networks:
+      - observacart-net
+
+  # Jaeger: Distributed tracing backend
+  jaeger:
+    image: jaegertracing/all-in-one:1.56 # All-in-one for simplicity in demo
+    ports:
+      - "16686:16686" # Jaeger UI
+      - "14250:14250" # gRPC collector
+      - "14268:14268" # HTTP collector
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    networks:
+      - observacart-net
+
+  # Prometheus: Metrics monitoring and alerting
+  prometheus:
+    image: prom/prometheus:v2.52.0 # Specific version
+    command:
+      - --config.file=/etc/prometheus/prometheus.yaml
+      - --web.enable-remote-write-receiver
+      - --enable-feature=exemplar-storage
+      - --enable-feature=native-histograms
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+    ports:
+      - "9090:9090" # Prometheus UI
+    networks:
+      - observacart-net
+
+  # Loki: Log aggregation system
+  loki:
+    image: grafana/loki:3.0.0 # Specific version
+    command: -config.file=/etc/loki/loki-config.yaml
+    volumes:
+      - ./loki/loki-config.yaml:/etc/loki/loki-config.yaml
+    ports:
+      - "3100:3100" # Loki HTTP API
+    networks:
+      - observacart-net
+
+  # Promtail: Agent to ship logs to Loki
+  promtail:
+    image: grafana/promtail:3.0.0 # Specific version
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    volumes:
+      # Mount Docker socket to allow Promtail to discover and read container logs
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Mount Promtail config
+      - ./loki/promtail-config.yaml:/etc/promtail/promtail-config.yaml
+    depends_on:
+      - loki
+    networks:
+      - observacart-net
+
+  # Grafana: Data visualization and dashboards
+  grafana:
+    image: grafana/grafana:11.1.0 # Specific version
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - "3000:3000" # Grafana UI
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true # Enable anonymous access for easy demo
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_PATHS_DASHBOARDS=/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+      - loki
+      - jaeger
+    networks:
+      - observacart-net
+
+networks:
+  observacart-net:
+    driver: bridge
