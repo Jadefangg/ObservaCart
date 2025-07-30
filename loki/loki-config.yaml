@@ -1,0 +1,24 @@
+auth_enabled: false # Disable authentication for simplicity in demo
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+
+common:
+  path_prefix: /tmp/loki
+  replication_factor: 1
+  ring:
+    instance_addr: 127.0.0.1
+    kvstore:
+      store: inmemory
+  # To avoid "level=warn ts=..." when running without persistent storage
+  # limits_config:
+  #   retention_period: 24h
+
+schema_config:
+  configs:
+    - from: 2020-10-27
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      period: 24h
