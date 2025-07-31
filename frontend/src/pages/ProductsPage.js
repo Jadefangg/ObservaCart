@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, InputGroup, Button, Alert } from 'react-bootstrap';
 import { productService } from '../services/api';
 import ProductCard from '../components/ProductCard';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -56,97 +55,147 @@ const ProductsPage = () => {
   }
 
   return (
-    <Container className="py-4">
-      <Row className="mb-4">
-        <Col>
-          <h1 className="display-5 fw-bold mb-3">Our Products</h1>
-          <p className="lead text-muted">
-            Discover our wide range of quality products
+    <div style={{ padding: 'var(--space-8) 0', minHeight: '100vh' }}>
+      <div className="container-modern">
+        {/* Header Section */}
+        <div style={{ marginBottom: 'var(--space-8)' }}>
+          <h1 style={{ 
+            fontSize: 'var(--text-5xl)', 
+            fontWeight: '800',
+            marginBottom: 'var(--space-4)',
+            color: 'var(--text-accent)'
+          }}>
+            Our Products
+          </h1>
+          <p style={{ 
+            fontSize: 'var(--text-xl)', 
+            color: 'var(--text-accent-light)',
+            maxWidth: '600px'
+          }}>
+            Discover our wide range of quality products with advanced observability tracking
           </p>
-        </Col>
-      </Row>
+        </div>
 
-      {/* Search Bar */}
-      <Row className="mb-4">
-        <Col lg={8}>
-          <InputGroup>
-            <Form.Control
+        {/* Search Bar */}
+        <div style={{ 
+          display: 'flex', 
+          gap: 'var(--space-4)', 
+          marginBottom: 'var(--space-8)',
+          flexWrap: 'wrap'
+        }}>
+          <div style={{ flex: '1', minWidth: '300px' }}>
+            <input
               type="text"
+              className="form-input-modern"
               placeholder="Search products by name, description, or category..."
               value={searchTerm}
               onChange={handleSearch}
+              style={{ width: '100%' }}
             />
-            <Button variant="outline-secondary" onClick={() => setSearchTerm('')}>
-              <i className="bi bi-x-lg"></i>
-            </Button>
-          </InputGroup>
-        </Col>
-        <Col lg={4} className="d-flex justify-content-end">
-          <Button variant="outline-primary" onClick={handleRefresh}>
-            <i className="bi bi-arrow-clockwise me-2"></i>
-            Refresh
-          </Button>
-        </Col>
-      </Row>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+            {searchTerm && (
+              <button 
+                className="btn-secondary"
+                onClick={() => setSearchTerm('')}
+                style={{ padding: 'var(--space-3)' }}
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
+            )}
+            <button 
+              className="btn-primary"
+              onClick={handleRefresh}
+            >
+              <i className="bi bi-arrow-clockwise"></i>
+              Refresh
+            </button>
+          </div>
+        </div>
 
-      {/* Error Alert */}
-      {error && (
-        <Row className="mb-4">
-          <Col>
-            <Alert variant="danger" dismissible onClose={() => setError(null)}>
-              <Alert.Heading>Error Loading Products</Alert.Heading>
-              {error}
-            </Alert>
-          </Col>
-        </Row>
-      )}
+        {/* Error Alert */}
+        {error && (
+          <div style={{
+            background: 'var(--danger-50)',
+            border: '1px solid var(--danger-200)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-4)',
+            marginBottom: 'var(--space-6)',
+            color: 'var(--danger-600)'
+          }}>
+            <h4 style={{ fontWeight: '600', marginBottom: 'var(--space-2)' }}>
+              Error Loading Products
+            </h4>
+            <p style={{ margin: 0 }}>{error}</p>
+          </div>
+        )}
 
-      {/* Products Grid */}
-      {filteredProducts.length === 0 && !loading ? (
-        <Row>
-          <Col className="text-center py-5">
-            <i className="bi bi-search display-1 text-muted mb-3"></i>
-            <h3 className="text-muted">
+        {/* Products Grid */}
+        {filteredProducts.length === 0 && !loading ? (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: 'var(--space-20) 0',
+            color: 'var(--text-accent-light)'
+          }}>
+            <i className="bi bi-search" style={{ 
+              fontSize: '4rem', 
+              marginBottom: 'var(--space-6)',
+              display: 'block',
+              opacity: '0.5'
+            }}></i>
+            <h3 style={{ 
+              fontSize: 'var(--text-2xl)', 
+              fontWeight: '600',
+              marginBottom: 'var(--space-4)'
+            }}>
               {searchTerm ? 'No products found' : 'No products available'}
             </h3>
-            <p className="text-muted">
+            <p style={{ 
+              fontSize: 'var(--text-lg)',
+              marginBottom: searchTerm ? 'var(--space-6)' : '0'
+            }}>
               {searchTerm 
                 ? `Try adjusting your search term "${searchTerm}"` 
                 : 'Check back later for new products'
               }
             </p>
             {searchTerm && (
-              <Button variant="primary" onClick={() => setSearchTerm('')}>
+              <button 
+                className="btn-primary"
+                onClick={() => setSearchTerm('')}
+              >
                 Clear Search
-              </Button>
+              </button>
             )}
-          </Col>
-        </Row>
-      ) : (
-        <>
-          {/* Results Info */}
-          <Row className="mb-3">
-            <Col>
-              <small className="text-muted">
-                {searchTerm && (
-                  <>Showing {filteredProducts.length} result(s) for "{searchTerm}" • </>
-                )}
-                {filteredProducts.length} product(s) total
-              </small>
-            </Col>
-          </Row>
+          </div>
+        ) : (
+          <>
+            {/* Results Info */}
+            {filteredProducts.length > 0 && (
+              <div style={{ marginBottom: 'var(--space-6)' }}>
+                <p style={{ 
+                  color: 'var(--text-accent-light)', 
+                  fontSize: 'var(--text-sm)',
+                  margin: 0
+                }}>
+                  {searchTerm && (
+                    <>Showing {filteredProducts.length} result(s) for "{searchTerm}" • </>
+                  )}
+                  {filteredProducts.length} product(s) total
+                </p>
+              </div>
+            )}
 
-          {/* Products Grid */}
-          <Row>
-            {filteredProducts.map((product) => (
-              <Col key={product.id} lg={4} md={6} className="mb-4">
-                <ProductCard product={product} />
-              </Col>
-            ))}
-          </Row>
-        </>
-      )}
-    </Container>
+            {/* Products Grid */}
+            <div className="grid-modern grid-3">
+              {filteredProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 

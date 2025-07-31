@@ -56,8 +56,99 @@ export const productService = {
   // Get all products
   getAllProducts: async () => {
     try {
-      const response = await productApi.get('/products');
-      return response.data;
+      // For demo purposes, return mock data if backend is not available
+      const mockProducts = [
+        {
+          id: 1,
+          name: "Premium Wireless Headphones",
+          description: "High-quality wireless headphones with noise cancellation and premium sound quality.",
+          price: 299.99,
+          category: "Electronics",
+          image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=240&fit=crop",
+          stock: 25
+        },
+        {
+          id: 2,
+          name: "Smart Fitness Watch",
+          description: "Advanced fitness tracking with heart rate monitor, GPS, and smartphone connectivity.",
+          price: 199.99,
+          category: "Electronics",
+          image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=240&fit=crop",
+          stock: 15
+        },
+        {
+          id: 3,
+          name: "Ergonomic Office Chair",
+          description: "Comfortable ergonomic office chair with lumbar support and adjustable height.",
+          price: 449.99,
+          category: "Furniture",
+          image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=240&fit=crop",
+          stock: 8
+        },
+        {
+          id: 4,
+          name: "Organic Coffee Beans",
+          description: "Premium organic coffee beans sourced from sustainable farms. Rich, bold flavor.",
+          price: 24.99,
+          category: "Food & Beverages",
+          image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=400&h=240&fit=crop",
+          stock: 50
+        },
+        {
+          id: 5,
+          name: "Minimalist Desk Lamp",
+          description: "Modern LED desk lamp with adjustable brightness and sleek minimalist design.",
+          price: 89.99,
+          category: "Home & Garden",
+          image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=240&fit=crop",
+          stock: 12
+        },
+        {
+          id: 6,
+          name: "Wireless Charging Pad",
+          description: "Fast wireless charging pad compatible with all Qi-enabled devices.",
+          price: 39.99,
+          category: "Electronics",
+          image: "https://images.unsplash.com/photo-1609081219090-a6d81d3085bf?w=400&h=240&fit=crop",
+          stock: 30
+        },
+        {
+          id: 7,
+          name: "Yoga Mat Pro",
+          description: "Professional-grade yoga mat with superior grip and cushioning for all yoga styles.",
+          price: 79.99,
+          category: "Sports & Fitness",
+          image: "https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=400&h=240&fit=crop",
+          stock: 20
+        },
+        {
+          id: 8,
+          name: "Stainless Steel Water Bottle",
+          description: "Insulated stainless steel water bottle that keeps drinks cold for 24h or hot for 12h.",
+          price: 34.99,
+          category: "Sports & Fitness",
+          image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=240&fit=crop",
+          stock: 45
+        },
+        {
+          id: 9,
+          name: "Bluetooth Speaker",
+          description: "Portable Bluetooth speaker with 360-degree sound and waterproof design.",
+          price: 129.99,
+          category: "Electronics",
+          image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=240&fit=crop",
+          stock: 18
+        }
+      ];
+
+      try {
+        const response = await productApi.get('/products');
+        return response.data;
+      } catch (error) {
+        // If backend is not available, return mock data
+        console.log('Backend not available, using mock data');
+        return { data: mockProducts };
+      }
     } catch (error) {
       console.error('Error fetching products:', error);
       throw error;

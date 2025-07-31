@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, ListGroup, Button, Row, Col, Image } from 'react-bootstrap';
+import { ListGroup, Button, Row, Col, Image } from 'react-bootstrap';
 import { useCart } from '../context/CartContext';
 
 const CartItem = ({ item }) => {

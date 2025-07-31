@@ -1,16 +1,28 @@
 import React from 'react';
-import { Spinner, Container, Row, Col } from 'react-bootstrap';
 
 const LoadingSpinner = ({ message = 'Loading...' }) => {
   return (
-    <Container className="d-flex justify-content-center align-items-center" style={{ minHeight: '200px' }}>
-      <Row>
-        <Col className="text-center">
-          <Spinner animation="border" variant="primary" className="mb-3" />
-          <div className="text-muted">{message}</div>
-        </Col>
-      </Row>
-    </Container>
+    <div style={{ 
+      display: 'flex', 
+      justifyContent: 'center', 
+      alignItems: 'center', 
+      minHeight: '200px',
+      flexDirection: 'column',
+      gap: 'var(--space-4)'
+    }}>
+      <div className="loading-modern" style={{ 
+        width: '40px', 
+        height: '40px',
+        borderWidth: '3px'
+      }}></div>
+      <div style={{ 
+        color: 'var(--text-accent-light)',
+        fontSize: 'var(--text-base)',
+        fontWeight: '500'
+      }}>
+        {message}
+      </div>
+    </div>
   );
 };
 

@@ -14,13 +14,13 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #37003f;
   padding: 20px;
-  color: white;
+  color: rgb(255, 0, 0);
 }
 
 .App-link {
-  color: #61dafb;
+  color: #4e005a;
 }
 
 @keyframes App-logo-spin {
@@ -33,7 +33,7 @@
 }
 
 .hero-section {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #764ba2 100%);
   color: white;
   padding: 4rem 0;
   margin-bottom: 2rem;
