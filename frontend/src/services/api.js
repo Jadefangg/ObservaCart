@@ -1,4 +1,8 @@
 import axios from 'axios';
+import { trace, context } from '@opentelemetry/api';
+
+// Get the tracer
+const tracer = trace.getTracer('observacart-frontend', '1.0.0');
 
 // API Base URLs - these should match your backend services
 const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5000';
@@ -55,8 +59,15 @@ addAuthInterceptor(orderApi);
 export const productService = {
   // Get all products
   getAllProducts: async () => {
-    try {
-      // For demo purposes, return mock data if backend is not available
+    return tracer.startActiveSpan('products.getAllProducts', async (span) => {
+      try {
+        span.setAttributes({
+          'service.name': 'observacart-frontend',
+          'operation.name': 'get-all-products',
+          'user.action': 'browse-products'
+        });
+
+        // For demo purposes, return mock data if backend is not available
       const mockProducts = [
         {
           id: 1,
@@ -139,23 +150,38 @@ export const productService = {
           image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=240&fit=crop",
           stock: 18
         }
-      ];
+        ];
 
-      try {
-        const response = await productApi.get('/products');
-        return response.data;
+        try {
+          const response = await productApi.get('/products');
+          span.setAttributes({
+            'http.status_code': response.status,
+            'products.count': response.data?.length || 0,
+            'data.source': 'backend'
+          });
+          span.setStatus({ code: 1 }); // SUCCESS
+          return response.data;
+        } catch (error) {
+          // If backend is not available, return mock data
+          console.log('Backend not available, using mock data');
+          span.setAttributes({
+            'data.source': 'mock',
+            'products.count': mockProducts.length,
+            'fallback.reason': 'backend_unavailable'
+          });
+          span.setStatus({ code: 1 }); // SUCCESS (fallback worked)
+          return { data: mockProducts };
+        }
       } catch (error) {
-        // If backend is not available, return mock data
-        console.log('Backend not available, using mock data');
-        return { data: mockProducts };
+        span.recordException(error);
+        span.setStatus({ code: 2, message: error.message }); // ERROR
+        console.error('Error fetching products:', error);
+        throw error;
+      } finally {
+        span.end();
       }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      throw error;
-    }
-  },
-
-  // Get product by ID
+    });
+  },  // Get product by ID
   getProductById: async (productId) => {
     try {
       const response = await productApi.get(`/products/${productId}`);
