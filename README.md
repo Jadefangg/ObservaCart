@@ -1,4 +1,4 @@
-# 🛒 ObservaCart
+# 🛒 Observ-a-Cart
 
 > **Modern E-commerce Platform with Full-Stack Observability**
 
